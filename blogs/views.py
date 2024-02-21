@@ -1,8 +1,13 @@
 from django.shortcuts import render, HttpResponseRedirect
+from django.contrib import messages
+from .forms import SignupForm, LoginForm
+from django.contrib.auth import authenticate,login,logout
+from .models import Post
 
 # Homepage
 def home(request):
-    return render(request, 'blogs/home.html')
+    posts = Post.objects.all()
+    return render(request, 'blogs/home.html', {'posts':posts})
 
 # About
 def about(request):
@@ -18,12 +23,36 @@ def dashboard(request):
 
 # Signup
 def signup(request):
-    return render(request, 'blogs/signup.html')
+    if request.method == 'POST':
+        fm = SignupForm(request.POST)
+        if fm.is_valid():
+            fm.save()
+            messages.success(request, 'Account created successfully!')
+            # return HttpResponseRedirect('/login/')
+    else:
+        fm = SignupForm()
+    return render(request, 'blogs/signup.html', {'form':fm})
 
 # Login
-def login(request):
-    return render(request, 'blogs/login.html')
+def user_login(request):
+    if not request.user.is_authenticated:
+        if request.method == 'POST':
+            fm = LoginForm(request=request, data=request.POST)
+            if fm.is_valid():
+                uname = fm.cleaned_data['username']
+                upass = fm.cleaned_data['password']
+                user = authenticate(username=uname, password=upass)
+                if user is not None:
+                    login(request, user)
+                    messages.success(request, 'Logged in successfully!')
+                    return HttpResponseRedirect('/dashboard/')
+        else:
+            fm = LoginForm()
+        return render(request, 'blogs/login.html', {'form':fm})
+    else:
+        return HttpResponseRedirect('/dashboard/')
 
 # Logout
 def user_logout(request):
-    return HttpResponseRedirect('/')
+    logout(request)
+    return HttpResponseRedirect('/login/')
