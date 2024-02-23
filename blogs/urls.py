@@ -11,4 +11,6 @@ urlpatterns = [
     path('addpost/', views.add_post, name='addpost'),
     path('updatepost/<int:id>/', views.update_post, name='updatepost'),
     path('delete/<int:id>/', views.delete_post, name='deletepost'),
+    path('profile/', views.user_profile, name='profile'),
+    path('changepassword/', views.change_pass, name='changepass')
 ]

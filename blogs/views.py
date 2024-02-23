@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib import messages
-from .forms import SignupForm, LoginForm, PostForm
-from django.contrib.auth import authenticate,login,logout
+from .forms import SignupForm, LoginForm, PostForm, EditAdminProfileForm, EditUserProfileForm, ChangeUserPassword
+from django.contrib.auth import authenticate,login,logout, update_session_auth_hash
 from .models import Post
 from django.contrib.auth.models import Group
 
@@ -107,3 +107,36 @@ def delete_post(request, id):
             return HttpResponseRedirect('/dashboard')
     else:
         return HttpResponseRedirect('/login/')
+    
+# User Profile
+def user_profile(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            if request.user.is_superuser == True:
+                fm = EditAdminProfileForm(request.POST, instance=request.user)
+                # users = User.objects.all()
+            else:
+                fm = EditUserProfileForm(request.POST, instance=request.user)
+            if fm.is_valid():
+                fm.save()
+                messages.success(request, 'Profile updated successfully!')
+        else:
+            if request.user.is_superuser == True:
+                fm = EditAdminProfileForm(instance=request.user)
+            else:
+                fm = EditUserProfileForm(instance=request.user)
+        return render(request, 'blogs/profile.html', {'form':fm})
+    else:
+        return HttpResponseRedirect('/login/')
+    
+# Change user password
+def change_pass(request):
+    if request.method == 'POST':
+        fm = ChangeUserPassword(user=request.user, data=request.POST)
+        if fm.is_valid():
+            fm.save()
+            update_session_auth_hash(request, fm.user)
+            messages.success(request, 'Password changed successfully!')
+    else:
+        fm = ChangeUserPassword(user=request.user)
+    return render(request, 'blogs/changepass.html', {'form':fm})
