@@ -3,6 +3,11 @@
 
 {% block content %}
     <div class="col-sm-10">
+        {% if messages %}
+        {% for message in messages %}
+        <p class="alert alert-success text-center">{{message}}</p>
+        {% endfor %}
+        {% endif %}
         <h1 class="text-white my-5"> Login </h1>
         <form method = 'POST' novalidate>
             {% csrf_token %}

@@ -1,8 +1,9 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib import messages
-from .forms import SignupForm, LoginForm
+from .forms import SignupForm, LoginForm, PostForm
 from django.contrib.auth import authenticate,login,logout
 from .models import Post
+from django.contrib.auth.models import Group
 
 # Homepage
 def home(request):
@@ -19,16 +20,24 @@ def contact(request):
 
 # Dashboard
 def dashboard(request):
-    return render(request, 'blogs/dashboard.html')
+    if request.user.is_authenticated:
+        posts = Post.objects.all()
+        user = request.user
+        gps = user.groups.all()
+        return render(request, 'blogs/dashboard.html', {'posts':posts, 'user':user, 'groups':gps})
+    else:
+        return HttpResponseRedirect('/login/')
 
 # Signup
 def signup(request):
     if request.method == 'POST':
         fm = SignupForm(request.POST)
         if fm.is_valid():
-            fm.save()
             messages.success(request, 'Account created successfully!')
-            # return HttpResponseRedirect('/login/')
+            user = fm.save()
+            group = Group.objects.get(name='Author')
+            user.groups.add(group)
+            return HttpResponseRedirect('/login/')
     else:
         fm = SignupForm()
     return render(request, 'blogs/signup.html', {'form':fm})
@@ -56,3 +65,45 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
+
+
+# Add post  
+def add_post(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            fm = PostForm(request.POST)
+            if fm.is_valid():
+                fm.save()
+                messages.success(request,'New Post Added Successfully!')
+                fm = PostForm()
+        else:
+            fm = PostForm()
+        return render(request, 'blogs/addpost.html',{'form':fm})
+    else:
+        return HttpResponseRedirect('/login/')
+
+# Update Post   
+def update_post(request, id):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            pi = Post.objects.get(pk=id)
+            fm = PostForm(request.POST, instance=pi)
+            if fm.is_valid():
+                fm.save()
+                messages.success(request, 'Post Updated Successfully')
+        else:
+            pi = Post.objects.get(pk=id)
+            fm = PostForm(instance=pi)
+        return render(request, 'blogs/updatepost.html', {'form':fm})
+    else:
+        return HttpResponseRedirect('/login/')
+    
+# Delete Post
+def delete_post(request, id):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            pi = Post.objects.get(pk=id)
+            pi.delete()
+            return HttpResponseRedirect('/dashboard')
+    else:
+        return HttpResponseRedirect('/login/')
