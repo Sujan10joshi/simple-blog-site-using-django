@@ -24,9 +24,10 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = '__all__'
-        labels = {'desc':'Description',}
+        labels = {'desc':'Description', 'thumb': 'Thumbnail',}
         widgets = {'title':forms.TextInput(attrs={'class':'form-control'}),
                    'desc':forms.Textarea(attrs={'class':'form-control'}),
+                   'thumb':forms.ClearableFileInput(attrs={'class':'form-control'}),
                    }
         
 class EditUserProfileForm(UserChangeForm):

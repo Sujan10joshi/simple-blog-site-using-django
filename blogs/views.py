@@ -71,7 +71,7 @@ def user_logout(request):
 def add_post(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            fm = PostForm(request.POST)
+            fm = PostForm(request.POST, request.FILES)
             if fm.is_valid():
                 fm.save()
                 messages.success(request,'New Post Added Successfully!')
@@ -131,12 +131,15 @@ def user_profile(request):
     
 # Change user password
 def change_pass(request):
-    if request.method == 'POST':
-        fm = ChangeUserPassword(user=request.user, data=request.POST)
-        if fm.is_valid():
-            fm.save()
-            update_session_auth_hash(request, fm.user)
-            messages.success(request, 'Password changed successfully!')
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            fm = ChangeUserPassword(user=request.user, data=request.POST)
+            if fm.is_valid():
+                fm.save()
+                update_session_auth_hash(request, fm.user)
+                messages.success(request, 'Password changed successfully!')
+        else:
+            fm = ChangeUserPassword(user=request.user)
+        return render(request, 'blogs/changepass.html', {'form':fm})
     else:
-        fm = ChangeUserPassword(user=request.user)
-    return render(request, 'blogs/changepass.html', {'form':fm})
+        return HttpResponseRedirect('/login')

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-3&x=28cq576vq*7_66z!qyg@p*2e_#mp2+0()l!!_-zuz&d*wu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app', '.now.sh', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -75,23 +75,23 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "railway",
-        "USER": "postgres",
-        "PASSWORD": "cEa2bEC-42E3AGDa22*45cGCb-6-G1F-",
-        "HOST": "viaduct.proxy.rlwy.net",
-        "PORT": "40660",
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "railway",
+#         "USER": "postgres",
+#         "PASSWORD": "cEa2bEC-42E3AGDa22*45cGCb-6-G1F-",
+#         "HOST": "viaduct.proxy.rlwy.net",
+#         "PORT": "40660",
+#     }
+# }
 
 
 # Password validation
@@ -131,6 +131,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 # STATICFILES_DIRS = [STATIC_DIR]
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
